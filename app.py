@@ -18,6 +18,13 @@ import pythoncom
 import psutil
 from docx2pdf import convert
 
+import sys
+
+# Conditionally import pythoncom only if on Windows
+if sys.platform == "win32":
+    import pythoncom
+
+
 app = Flask(__name__)
 # Index route
 @app.route('/')
