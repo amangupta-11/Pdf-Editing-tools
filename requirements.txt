@@ -1,4 +1,4 @@
-﻿aspose-words==24.11.0
+aspose-words==24.11.0
 beautifulsoup4==4.12.2
 blinker==1.6.2
 bs4==0.0.1
@@ -12,10 +12,11 @@ cryptography==43.0.3
 deprecation==2.1.0
 docx2pdf==0.1.8
 fire==0.5.0
-Flask==2.3.2
-Flask-Cors==5.0.0
+Flask==2.3.3
+Flask-Cors==3.0.10
 fonttools==4.42.1
 fpdf==1.7.2
+gunicorn==20.1.0
 idna==3.4
 img2pdf==0.4.4
 itsdangerous==2.1.2
@@ -43,7 +44,8 @@ PyPDF2==3.0.1
 pypdfium2==4.30.0
 python-docx==0.8.11
 python-pptx==0.6.23
-pytube==15.0.0
+pytube==12.1.0
+pywin32==306
 reportlab==4.2.5
 requests==2.31.0
 six==1.16.0
@@ -51,17 +53,6 @@ soupsieve==2.4.1
 termcolor==2.3.0
 tqdm==4.66.1
 urllib3==2.0.3
-Werkzeug==2.3.6
+Werkzeug==3.1.3
 XlsxWriter==3.2.0
 youtube-dl==2021.12.17
-Flask==2.3.3
-Werkzeug>=2.3.3
-gunicorn==20.1.0
-Flask-CORS==3.0.10
-PyMuPDF==1.22.5
-Flask==2.3.3
-Werkzeug>=2.3.3
-gunicorn==20.1.0
-Flask-CORS==3.0.10
-pytube==12.1.0  # Update to a version compatible with Python 3.11
-PyMuPDF==1.22.5
