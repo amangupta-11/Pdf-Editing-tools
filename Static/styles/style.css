@@ -1,0 +1,94 @@
+/* Apply a clean, modern background with a mixed gradient */
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #74b9ff, #a29bfe, #ff7675); /* Mixed-color gradient */
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align items to the top */
+    padding-top: 50px; /* Add some space from the top */
+    background-size: cover;
+    background-position: center;
+}
+
+/* Container Styling */
+.container {
+    background-color: rgba(255, 255, 255, 0.9); /* Slight transparent white background */
+    padding: 20px 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 80%;
+    max-width: 450px;
+}
+
+/* Styling the file input */
+input[type="file"] {
+    margin-top: 20px;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 2px solid #ccc;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+input[type="file"]:hover {
+    background-color: #e6e6e6;
+}
+
+/* File info section */
+#file-info {
+    margin-top: 20px;
+    display: none;
+}
+
+/* Button styling */
+button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Style for the remove file button */
+button[type="button"] {
+    background-color: #f44336; /* Red */
+    margin-top: 10px;
+}
+
+button[type="button"]:hover {
+    background-color: #e53935;
+}
+
+/* Tool name display */
+#tool-name {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .container {
+        width: 90%;
+        padding: 15px;
+    }
+    
+    #tool-name {
+        font-size: 22px; /* Make the tool name smaller on mobile */
+    }
+}

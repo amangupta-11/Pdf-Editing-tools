@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>File Selection</title>
+        <!-- Link to the CSS file using url_for -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+    </head>
+<body>
+    <div class="container">        
+        <!-- Merge PDFs -->
+        {% if tool == 'merge_pdfs' %}
+        <h1>Merge PDFs</h1>
+        <p>Combine PDFs in the order you want with the easiest PDF merger available.</p>
+        <form id="pdf-upload-form" method="POST" enctype="multipart/form-data">
+            <label id="select-file-label" for="file">Select PDF file:</label>
+            <input type="file" id="file" name="file" accept="application/pdf" required onchange="displaySelectedFile(this)">
+    
+            <div id="selected-files-list">
+                <!-- Selected files and remove options will appear here -->
+            </div>
+    
+            <button type="button" id="add-more-btn" onclick="addMoreFiles()" style="display:none;">Add More PDFs</button>
+            <button type="submit" id="merge-btn" style="display:none;">Merge PDFs</button>
+        </form>
+    
+        <script>
+            const selectedFiles = [];
+    
+            function displaySelectedFile(input) {
+                if (input.files.length > 0) {
+                    const file = input.files[0];
+                    selectedFiles.push(file);
+    
+                    // Display the selected file name with a "Remove" button
+                    const fileList = document.getElementById('selected-files-list');
+                    const fileDiv = document.createElement('div');
+                    fileDiv.classList.add('file-entry');
+    
+                    const fileNameDiv = document.createElement('span');
+                    fileNameDiv.textContent = file.name;
+    
+                    const removeButton = document.createElement('button');
+                    removeButton.textContent = 'Remove';
+                    removeButton.onclick = () => removeFile(file, fileDiv);
+    
+                    fileDiv.appendChild(fileNameDiv);
+                    fileDiv.appendChild(removeButton);
+                    fileList.appendChild(fileDiv);
+    
+                    // Hide the "Choose File" input and label after the first file is selected
+                    document.getElementById('file').style.display = 'none';
+                    document.getElementById('select-file-label').style.display = 'none';
+    
+                    // Show the "Add More PDFs" and "Merge" buttons
+                    document.getElementById('add-more-btn').style.display = 'inline';
+                    document.getElementById('merge-btn').style.display = 'inline';
+                }
+            }
+    
+            function addMoreFiles() {
+                // Trigger the file input dialog again to add more files
+                document.getElementById('file').value = ''; // Clear previous file selection
+                document.getElementById('file').click();
+            }
+    
+            function removeFile(file, fileDiv) {
+                // Remove file from selectedFiles array
+                const index = selectedFiles.indexOf(file);
+                if (index > -1) {
+                    selectedFiles.splice(index, 1);
+                }
+                
+                // Remove file's div element from the display
+                fileDiv.remove();
+    
+                // Show "Choose File" input if all files are removed
+                if (selectedFiles.length === 0) {
+                    document.getElementById('file').style.display = 'inline';
+                    document.getElementById('select-file-label').style.display = 'inline';
+                    document.getElementById('add-more-btn').style.display = 'none';
+                    document.getElementById('merge-btn').style.display = 'none';
+                }
+            }
+    
+            // Handle form submission
+            document.getElementById('pdf-upload-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+    
+                // Use FormData to send multiple files
+                const formData = new FormData();
+                selectedFiles.forEach((file, index) => formData.append(`file${index}`, file));
+    
+                // Send files to server
+                fetch('{{ url_for("file_selection", tool="merge_pdfs") }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.blob())
+                .then(blob => {
+                    // Create a download link for the merged PDF
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'merged_output.pdf';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        </script>    
+
+        <!-- JPG to PDF -->
+        {% elif tool == 'jpg_to_pdf' %}
+        <h1>JPG to PDF</h1>
+        <p>Convert JPG images to PDF in seconds. Easily adjust orientation and margins.</p>
+        <form id="image-to-pdf-form" method="POST" enctype="multipart/form-data" action="/convert_to_pdf">
+            <label for="files">Select Image Files (JPG, JPEG, PNG):</label>
+            <input type="file" id="files" name="files" accept=".jpg,.jpeg,.png" multiple required onchange="updateFileList(this)">
+            
+            <div id="file-info" style="display: none;">
+                <h3>Selected Files:</h3>
+                <ul id="file-list"></ul>
+                <button type="button" onclick="clearFiles()">Clear Files</button>
+            </div>
+            
+            <button type="submit" id="convert-button" style="display: none;">Convert to PDF</button>
+        </form>
+        
+        <script>
+            let selectedFile = [];  // Use a consistent variable name
+        
+            // Update the file list when files are selected
+            function updateFileList(input) {
+                const files = Array.from(input.files);
+                selectedFile = selectedFile.concat(files);
+        
+                const fileList = document.getElementById('file-list');
+                fileList.innerHTML = ''; // Clear previous list
+        
+                selectedFile.forEach((file, index) => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = file.name;
+        
+                    // Add a remove button
+                    const removeButton = document.createElement('button');
+                    removeButton.textContent = 'Remove';
+                    removeButton.onclick = () => removeFile(index);
+                    listItem.appendChild(removeButton);
+        
+                    fileList.appendChild(listItem);
+                });
+        
+                // Show file info and the submit button when files are selected
+                document.getElementById('file-info').style.display = 'block';
+                document.getElementById('convert-button').style.display = 'inline-block';
+            }
+        
+            // Remove a specific file from the list
+            function removeFile(index) {
+                selectedFiles.splice(index, 1);
+                updateFileList({ files: selectedFiles });
+                
+                // If no files are left, hide the file info and submit button
+                if (selectedFiles.length === 0) {
+                    document.getElementById('file-info').style.display = 'none';
+                    document.getElementById('convert-button').style.display = 'none';
+                }
+            }
+        
+            // Clear all selected files
+            function clearFiles() {
+                selectedFiles = [];
+                document.getElementById('files').value = ''; // Clear the file input
+                document.getElementById('file-info').style.display = 'none';
+                document.getElementById('convert-button').style.display = 'none';
+            }
+        </script>
+
+        <!-- PDF to JPG -->
+        {% elif tool == 'pdf_to_jpg' %}
+        <h1>PDF to JPG</h1>
+        <p>Convert each PDF page into a JPG or extract all images contained in a PDF.</p>
+        <form id="pdf-to-jpg-form" method="POST" enctype="multipart/form-data" action="/convert_to_jpg">
+            <label for="file">Select PDF File:</label>
+            <input type="file" id="file" name="file" accept=".pdf" required onchange="updateFileName(this)">
+    
+            <div id="file-info" style="display: none;">
+                <h3>Selected File:</h3>
+                <p id="file-name"></p>
+                <button type="button" onclick="clearFile()">Remove File</button>
+            </div>
+    
+            <button type="submit" id="convert-button" style="display: none;">Convert to JPG</button>
+        </form>
+    
+        <script>
+            // Update the file name when a PDF is selected
+            function updateFileName(input) {
+                const file = input.files[0];
+                if (file) {
+                    document.getElementById('file-name').textContent = file.name;
+                    document.getElementById('file-info').style.display = 'block';
+                    document.getElementById('convert-button').style.display = 'inline-block';
+                }
+            }
+    
+            // Clear the selected file
+            function clearFile() {
+                document.getElementById('file').value = ''; // Clear the input
+                document.getElementById('file-info').style.display = 'none';
+                document.getElementById('convert-button').style.display = 'none';
+            }
+        </script>    
+
+        <!-- Add Page Numbers -->
+        {% elif tool == 'add_page_numbers' %}
+        <h1>Add Page Numbers</h1>
+        <p>Add page numbers into PDFs with ease. Choose your positions, dimensions, typography.</p>
+<form id="add-page-numbers-form" method="POST" enctype="multipart/form-data" action="/add_page_numbers">
+    <label for="file">Select PDF File:</label>
+    <input type="file" id="file" name="file" accept=".pdf" required onchange="updateFileName(this)">
+
+    <div id="file-info" style="display: none; margin-top: 10px;">
+        <h3>Selected File:</h3>
+        <p id="file-name"></p>
+        <button type="button" onclick="clearFile()">Remove File</button>
+    </div>
+
+    <label for="position">Select Page Number Position:</label>
+    <select id="position" name="position" required>
+        <option value="bottom-left">Bottom Left</option>
+        <option value="bottom-right">Bottom Right</option>
+        <option value="top-left">Top Left</option>
+        <option value="top-right">Top Right</option>
+    </select>
+
+    <button type="submit" id="add-numbers-button" style="display: none; margin-top: 10px;">Add Page Numbers</button>
+</form>
+
+<script>
+    // Update the file name when a PDF is selected
+    function updateFileName(input) {
+        const file = input.files[0];
+        if (file) {
+            document.getElementById('file-name').textContent = file.name;
+            document.getElementById('file-info').style.display = 'block';
+            document.getElementById('add-numbers-button').style.display = 'inline-block';
+        }
+    }
+
+    // Clear the selected file and reset the UI
+    function clearFile() {
+        const fileInput = document.getElementById('file');
+        const fileInfo = document.getElementById('file-info');
+        const addNumbersButton = document.getElementById('add-numbers-button');
+
+        if (fileInput) fileInput.value = ''; // Clear the input
+        if (fileInfo) fileInfo.style.display = 'none';
+        if (addNumbersButton) addNumbersButton.style.display = 'none';
+    }
+</script>
+
+        <!-- Rotate PDF -->
+        {% elif tool == 'rotate_pdf' %}
+        <h1>Rotate PDF</h1>
+        <p>Rotate your PDFs the way you need them.</p>
+        <form id="pdf-rotate-form" method="POST" enctype="multipart/form-data">
+            <label for="file">Select PDF file:</label>
+            <input type="file" id="file" name="file" accept="application/pdf" required onchange="handleFileSelect(this)">
+            
+            <div id="file-info" style="display: none; margin-top: 10px;">
+                <p id="selected-file-name"></p>
+                <button type="button" id="remove-file" onclick="removeFile()">Remove File</button>
+            </div>
+            
+            <div id="rotate-actions" style="display: none; margin-top: 20px;">
+                <h3>Rotate your PDF</h3>
+                <button type="button" id="rotate-left" onclick="rotatePdf('left')">⟲ Rotate Left</button>
+                <button type="button" id="rotate-right" onclick="rotatePdf('right')">⟳ Rotate Right</button>
+            </div>
+    
+            <div id="rotation-status" style="margin-top: 20px; font-weight: bold; display: none;">
+                <!-- Rotation status will be displayed here -->
+            </div>
+    
+            <button type="button" id="download-rotated" style="display: none; margin-top: 20px;">Download Rotated PDF</button>
+        </form>
+    
+        <script>
+            let selectedPdf = null;
+            let currentRotation = 0; // Tracks the current rotation state
+    
+            // Display the selected PDF name and enable actions
+            function handleFileSelect(input) {
+                if (input.files.length > 0) {
+                    selectedPdf = input.files[0];
+                    document.getElementById('selected-file-name').textContent = `Selected File: ${selectedPdf.name}`;
+                    document.getElementById('file-info').style.display = 'block';
+                    document.getElementById('rotate-actions').style.display = 'block';
+                    document.getElementById('rotation-status').style.display = 'none';
+                    currentRotation = 0; // Reset rotation state
+                }
+            }
+    
+            // Remove the selected file
+            function removeFile() {
+                selectedPdf = null;
+                document.getElementById('file').value = '';
+                document.getElementById('file-info').style.display = 'none';
+                document.getElementById('rotate-actions').style.display = 'none';
+                document.getElementById('rotation-status').style.display = 'none';
+                document.getElementById('download-rotated').style.display = 'none';
+            }
+    
+            // Rotate the PDF in the selected direction
+            function rotatePdf(direction) {
+                if (!selectedPdf) {
+                    alert("Please select a PDF first.");
+                    return;
+                }
+    
+                const formData = new FormData();
+                formData.append('file', selectedPdf);
+                formData.append('direction', direction);
+    
+                fetch('/rotate_pdf', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.blob();
+                    } else {
+                        throw new Error('Failed to rotate PDF');
+                    }
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const downloadButton = document.getElementById('download-rotated');
+                    downloadButton.style.display = 'block';
+                    downloadButton.onclick = () => {
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'rotated_output.pdf';
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                    };
+    
+                    // Update the rotation status
+                    const rotationStatus = document.getElementById('rotation-status');
+                    currentRotation = (currentRotation + (direction === 'left' ? -90 : 90)) % 360;
+                    rotationStatus.textContent = `PDF is rotated ${currentRotation}° ${direction === 'left' ? 'left' : 'right'}`;
+                    rotationStatus.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        </script>    
+
+        <!-- Split PDF -->
+        {% elif tool == 'split_pdf' %}
+        <h1>Split PDF</h1>
+        <p>Separate one page or a whole set for easy conversion into independent PDF files.</p>
+        <form method="POST" enctype="multipart/form-data" action="/split_pdf">
+            <label for="file">Select PDF File:</label>
+            <input type="file" id="file" name="file" accept=".pdf" required onchange="showPageRangeInput()">
+            <br><br>
+    
+            <div id="page-range-container" style="display: none;">
+                <label for="page-range">Enter Page Range (e.g., 1-5 or 3, 7, 10):</label>
+                <input type="text" id="page-range" name="page_range" placeholder="1-5 or 3, 7, 10" required>
+                <br><br>
+                <button type="submit">Split PDF</button>
+            </div>
+        </form>
+    
+        <script>
+            function showPageRangeInput() {
+                // Show the page range input field after PDF is selected
+                document.getElementById('page-range-container').style.display = 'block';
+            }
+        </script>    
+
+        <!-- Protect PDF -->
+        {% elif tool == 'protect_pdf' %}
+        <h1>Protect PDF file</h1>        
+        <p>Encrypt your PDF with a password to keep sensitive data confidential.</p>
+        <form method="POST" enctype="multipart/form-data" id="fileForm">
+            <input type="file" name="file" id="file" required accept=".pdf" onchange="handleFileSelect(event)" style="display: block; margin-bottom: 10px;">
+            
+            <div id="fileName" style="margin-top: 10px; font-weight: bold; display: none;"></div>
+            
+            <button type="button" id="removeButton" onclick="handleRemoveFile()" style="display: none; margin-top: 10px;">Remove File</button>
+
+            <div id="passwordSection" style="display: none; margin-top: 20px;">
+                <h2>Set a password to protect your PDF file</h2>
+                <label for="password">Type password</label>
+                <input type="password" name="password" required>
+                <br>
+                <label for="confirm_password">Repeat password</label>
+                <input type="password" name="confirm_password" required>
+                <br>
+                <input type="submit" value="Protect PDF">
+            </div>
+        </form>
+
+    <a href="{{ url_for('index') }}">Go back</a>
+
+    <script>
+        function handleFileSelect(event) {
+            const fileInput = event.target;
+            const fileNameDisplay = document.getElementById('fileName');
+            const passwordSection = document.getElementById('passwordSection');
+            const removeButton = document.getElementById('removeButton');
+
+            if (fileInput.files.length > 0) {
+                // Display the selected file name
+                fileNameDisplay.textContent = `Selected file: ${fileInput.files[0].name}`;
+                fileNameDisplay.style.display = 'block';
+                // Show the password section
+                passwordSection.style.display = 'block';
+                // Show the remove button
+                removeButton.style.display = 'inline-block';
+            }
+        }
+
+        function handleRemoveFile() {
+            const fileInput = document.getElementById('file');
+            const fileNameDisplay = document.getElementById('fileName');
+            const passwordSection = document.getElementById('passwordSection');
+            const removeButton = document.getElementById('removeButton');
+
+            // Reset file input
+            fileInput.value = '';
+            // Hide file name display and password section
+            fileNameDisplay.textContent = '';
+            fileNameDisplay.style.display = 'none';
+            passwordSection.style.display = 'none';
+            removeButton.style.display = 'none';
+        }
+    </script>
+
+        <!-- Unlock PDF -->
+        {% elif tool == 'unlock_pdf' %}
+        <h1>Unlock PDF</h1>
+        <p>Remove PDF password security, giving you the freedom to use your PDFs as you want.</p>
+        <form id="pdf-unlock-form" method="POST" enctype="multipart/form-data" action="/unlock_pdf">
+            <label for="file">Select PDF File:</label>
+            <input type="file" id="file" name="file" accept=".pdf" required onchange="checkPDF(this)">
+            <div id="password-section" style="display: none;">
+                <label for="password">Enter Password:</label>
+                <input type="password" id="password" name="password">
+            </div>
+            <button type="submit" style="margin-top: 10px;">Unlock PDF</button>
+        </form>
+
+        <script>
+            function checkPDF(fileInput) {
+                const file = fileInput.files[0];
+                if (!file) {
+                    alert("Please select a file.");
+                    return;
+                }
+    
+                const formData = new FormData();
+                formData.append("file", file);
+    
+                // Send file to server for protection check
+                fetch("/check_pdf_protection", {
+                    method: "POST",
+                    body: formData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.protected) {
+                            document.getElementById("password-section").style.display = "block";
+                            alert("The PDF is password-protected. Please enter the password to unlock it.");
+                        } else if (data.protected === false) {
+                            alert("This PDF is not password-protected.");
+                        } else {
+                            alert(data.error || "An unknown error occurred.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("An error occurred while checking the PDF.");
+                    });
+            }
+        </script>
+
+        <!-- PDF to Word -->
+        {% elif tool == 'pdf_to_word' %}
+        <h1>PDF to Word</h1>
+        <p>Convert your PDF to Word documents with incredible accuracy.</p>
+        <form id="pdf-to-word-form" method="POST" enctype="multipart/form-data" action="/convert_to_word">
+            <label for="file">Select PDF File:</label>
+            <input type="file" id="file" name="file" accept=".pdf" required onchange="updateFileName(this)">
+    
+            <div id="file-info" style="display: none;">
+                <h3>Selected File:</h3>
+                <p id="file-name"></p>
+                <button type="button" onclick="clearFile()">Remove File</button>
+            </div>
+    
+            <button type="submit" id="convert-button" style="display: none;">Convert to Word</button>
+        </form>
+    
+        <script>
+            // Update the file name when a PDF is selected
+            function updateFileName(input) {
+                const file = input.files[0];
+                if (file) {
+                    document.getElementById('file-name').textContent = file.name;
+                    document.getElementById('file-info').style.display = 'block';
+                    document.getElementById('convert-button').style.display = 'inline-block';
+                }
+            }
+    
+            // Clear the selected file
+            function clearFile() {
+                document.getElementById('file').value = ''; // Clear the input
+                document.getElementById('file-info').style.display = 'none';
+                document.getElementById('convert-button').style.display = 'none';
+            }
+        </script>    
+
+        <!-- Word to PDF -->
+        {% elif tool == 'word_to_pdf' %}
+        <h1>Word to PDF</h1>
+        <p>Make DOC and DOCX files easy to read by converting them to PDF.</p>
+        <form id="word-to-pdf-form" method="POST" enctype="multipart/form-data" action="/convert_word_to_pdf">
+            <label for="file">Select Word File (.docx):</label>
+            <input type="file" id="file" name="file" accept=".docx" required onchange="updateFileName(this)">
+    
+            <div id="file-info" style="display: none;">
+                <h3>Selected File:</h3>
+                <p id="file-name"></p>
+                <button type="button" onclick="clearFile()">Remove File</button>
+            </div>
+    
+            <button type="submit" id="convert-button" style="display: none;">Convert to PDF</button>
+        </form>
+    
+        <script>
+            // Update the file name when a Word document is selected
+            function updateFileName(input) {
+                const file = input.files[0];
+                if (file) {
+                    document.getElementById('file-name').textContent = file.name;
+                    document.getElementById('file-info').style.display = 'block';
+                    document.getElementById('convert-button').style.display = 'inline-block';
+                }
+            }
+    
+            // Clear the selected file
+            function clearFile() {
+                document.getElementById('file').value = ''; // Clear the input
+                document.getElementById('file-info').style.display = 'none';
+                document.getElementById('convert-button').style.display = 'none';
+            }
+        </script>    
+
+        <!-- Remove Pages -->
+        {% elif tool == 'remove_pages' %}
+        <h1>Remove Pages</h1>
+        <p>Select and remove the PDF pages you don't need.</p>
+        <form id="remove-pages-form" method="POST" enctype="multipart/form-data" action="/remove_pages">
+            <!-- File input -->
+            <label for="file">Select PDF File:</label>
+            <input type="file" id="file" name="file" accept=".pdf" required onchange="handleFileSelection()">
+    
+            <!-- Page input, initially hidden -->
+            <div id="pages-input-div" style="display: none;">
+                <label for="pages">Enter Pages to Remove (e.g., 1, 3, 5):</label>
+                <input type="text" id="pages" name="pages" placeholder="e.g., 1,3,5" required>
+            </div>
+    
+            <button type="submit">Remove Pages</button>
+        </form>
+
+        <script>
+            // Function to display the page removal input after selecting a file
+            function handleFileSelection() {
+                const fileInput = document.getElementById('file');
+                const pagesInputDiv = document.getElementById('pages-input-div');
+                
+                // Show the page removal input field if a file is selected
+                if (fileInput.files.length > 0) {
+                    pagesInputDiv.style.display = 'block';
+                } else {
+                    pagesInputDiv.style.display = 'none';
+                }
+            }
+        </script>    
+
+        <!-- Watermark PDF -->
+        {% elif tool == 'add_watermark' %}
+        <h1>Watermark PDF</h1>
+        <p>Stamp an image or text over your PDF in seconds. Choose the typography, transparency, and position.</p>
+<form id="watermark-form" method="POST" enctype="multipart/form-data" action="/apply_watermark">
+    <label for="file">Select PDF File:</label>
+    <input type="file" id="file" name="file" accept=".pdf" required onchange="toggleOptions()">
+    <br><br>
+
+    <div id="watermark-options" style="display: none;">
+        <h3>Choose Watermark Type:</h3>
+        <input type="radio" id="watermark-text" name="watermark_type" value="text" onclick="toggleFields()" required>
+        <label for="watermark-text">Text</label>
+
+        <input type="radio" id="watermark-image" name="watermark_type" value="image" onclick="toggleFields()" required>
+        <label for="watermark-image">Image</label>
+
+        <div id="text-field" style="display: none;">
+            <label for="watermark_text">Enter Watermark Text:</label>
+            <input type="text" id="watermark_text" name="watermark_text">
+        </div>
+
+        <div id="image-field" style="display: none;">
+            <label for="watermark_image">Upload Watermark Image:</label>
+            <input type="file" id="watermark_image" name="watermark_image" accept="image/*">
+        </div>
+
+        <label for="position">Select Position for Watermark:</label>
+        <select id="position" name="position">
+            <option value="top-left">Top Left</option>
+            <option value="top-right">Top Right</option>
+            <option value="center" selected>Center</option>
+            <option value="bottom-left">Bottom Left</option>
+            <option value="bottom-right">Bottom Right</option>
+        </select>
+    </div>
+
+    <br><button type="submit" style="display: none;" id="add-watermark-button">Add Watermark</button>
+</form>
+
+<script>
+    function toggleOptions() {
+        document.getElementById('watermark-options').style.display = 'block';
+    }
+
+    function toggleFields() {
+        const textField = document.getElementById('text-field');
+        const imageField = document.getElementById('image-field');
+        const watermarkText = document.getElementById('watermark-text').checked;
+
+        if (watermarkText) {
+            textField.style.display = 'block';
+            imageField.style.display = 'none';
+        } else {
+            textField.style.display = 'none';
+            imageField.style.display = 'block';
+        }
+
+        document.getElementById('add-watermark-button').style.display = 'block';
+    }
+</script>
+        {% else %}
+        <p>Tool not supported yet.</p>
+        {% endif %}   
+    </div>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Editor Tools</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f7f7f7, #e3e3e3);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: #fff;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 36px;
+            font-weight: 600;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Card Styles */
+        .grid-item {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px 25px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .grid-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .grid-item i {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: #6e8efb;
+        }
+
+        .grid-item h3 {
+            margin: 10px 0 8px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .grid-item p {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+        }
+
+        /* Footer Styles */
+        footer {
+            text-align: center;
+            padding: 20px 10px;
+            background-color: #6e8efb;
+            color: #fff;
+            margin-top: 40px;
+        }
+
+        footer p {
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 28px;
+            }
+
+            .grid-item i {
+                font-size: 30px;
+            }
+
+            .grid-item h3 {
+                font-size: 18px;
+            }
+        }
+    </style>
+    <script>
+        function changeToolName(toolName) {
+            // Change the text of the #tool-name element
+            document.getElementById('tool-name').textContent = toolName;
+        }
+    </script>    
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <h1>PDF Editor Tools</h1>
+    </header>
+
+    <!-- Grid Container -->
+    <div class="grid-container">
+        <!-- Merge PDF -->
+        <div class="grid-item" onclick="location.href='/file_selection/merge_pdfs';">
+            <i class="fas fa-file-pdf"></i>
+            <h3>Merge PDF Files</h3>
+            <p>Combine PDFs in the order you want with the easiest PDF merger available.</p>
+        </div>
+
+        <!-- JPG to PDF -->
+        <div class="grid-item" onclick="location.href='/file_selection/jpg_to_pdf';">
+            <i class="fas fa-image"></i>
+            <h3>JPG to PDF</h3>
+            <p>Convert JPG images to PDF in seconds. Easily adjust orientation and margins.</p>
+        </div>
+
+        <!-- PDF to JPG -->
+        <div class="grid-item" onclick="location.href='/file_selection/pdf_to_jpg';">
+            <i class="fas fa-file-image"></i>
+            <h3>PDF to JPG</h3>
+            <p>Convert each PDF page into a JPG or extract all images contained in a PDF.</p>
+        </div>
+
+        <!-- Add PDF Page Numbers -->
+        <div class="grid-item" onclick="location.href='/file_selection/add_page_number';">
+            <i class="fas fa-sort-numeric-up-alt"></i>
+            <h3>Add PDF Page Numbers</h3>
+            <p>Add page numbers into PDFs with ease. Choose your positions, dimensions, typography.</p>
+        </div>
+
+        <!-- Rotate PDF -->
+        <div class="grid-item" onclick="location.href='/file_selection/rotate_pdf';">
+            <i class="fas fa-sync-alt"></i>
+            <h3>Rotate PDF</h3>
+            <p>Rotate your PDFs the way you need them.</p>
+        </div>
+
+        <!-- Protect PDF -->
+        <div class="grid-item" onclick="location.href='/file_selection/protect_pdf';">
+            <i class="fas fa-lock"></i>
+            <h3>Protect PDF File</h3>
+            <p>Encrypt your PDF with a password to keep sensitive data confidential.</p>
+        </div>
+
+        <!-- Unlock PDF -->
+        <div class="grid-item" onclick="location.href='/file_selection/unlock_pdf';">
+            <i class="fas fa-lock-open"></i>
+            <h3>Unlock PDF</h3>
+            <p>Remove PDF password security, giving you the freedom to use your PDFs as you want.</p>
+        </div>
+
+        <!-- PDF to Word -->
+        <div class="grid-item" onclick="location.href='/file_selection/pdf_to_word';">
+            <i class="fas fa-file-word"></i>
+            <h3>PDF to Word</h3>
+            <p>Convert your PDF to Word documents with incredible accuracy.</p>
+        </div>
+
+        <!-- Word to PDF -->
+        <div class="grid-item" onclick="location.href='/file_selection/word_to_pdf';">
+            <i class="fas fa-file"></i>
+            <h3>Word to PDF</h3>
+            <p>Make DOC and DOCX files easy to read by converting them to PDF.</p>
+        </div>
+
+        <!-- Remove PDF Pages -->
+        <div class="grid-item" onclick="location.href='/file_selection/remove_pages';">
+            <i class="fas fa-trash-alt"></i>
+            <h3>Remove PDF Pages</h3>
+            <p>Select and remove the PDF pages you don't need.</p>
+        </div>
+
+        <!-- Watermark PDF -->
+        <div class="grid-item" onclick="location.href='/file_selection/add_watermark';">
+            <i class="fas fa-water"></i>
+            <h3>Watermark PDF</h3>
+            <p>Stamp an image or text over your PDF in seconds. Choose the typography, transparency, and position.</p>
+        </div>
+
+        <!-- Split PDF -->
+        <div class="grid-item" onclick="location.href='/file_selection/split_pdf';">
+            <i class="fas fa-columns"></i>
+            <h3>Split PDF</h3>
+            <p>Separate one page or a whole set for easy conversion into independent PDF files.</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 PDF Editor Tools. All rights reserved.</p>
+    </footer>
+</body>
