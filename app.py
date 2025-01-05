@@ -17,13 +17,16 @@ from docx import Document
 import pythoncom
 import psutil
 from docx2pdf import convert
-from app import app
 
 app = Flask(__name__)
 # Index route
 @app.route('/')
 def index():
     return render_template('index.html')
+
+# Ensure 'uploads' and 'output' directories exist
+os.makedirs('uploads', exist_ok=True)
+os.makedirs('output', exist_ok=True)
 
 # ------------------------- Merge PDFs -------------------------
 @app.route('/file_selection/merge_pdfs', methods=['GET', 'POST'], endpoint='file_selection_merge_pdfs')
