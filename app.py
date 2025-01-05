@@ -17,7 +17,7 @@ from docx import Document
 import pythoncom
 import psutil
 from docx2pdf import convert
-
+from app import app
 
 app = Flask(__name__)
 # Index route
