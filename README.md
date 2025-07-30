@@ -32,3 +32,11 @@ This project provides the following PDF editing tools:
 1. On the homepage, you will see a grid of PDF editing tools.
 2. Click on any tool to go to the corresponding page for that functionality (e.g., **Merge PDF Files**, **JPG to PDF**, etc.).
 3. Follow the instructions on each page to upload files and apply the tool's functions.
+
+Screen Shots
+
+<img width="1135" height="703" alt="image" src="https://github.com/user-attachments/assets/9bec894e-9be5-4955-afcf-1a82e905276c" />
+
+<img width="1115" height="400" alt="image" src="https://github.com/user-attachments/assets/08088419-3987-4bc6-a0c2-20a75d44fb12" />
+
+<img width="1242" height="375" alt="image" src="https://github.com/user-attachments/assets/7d0e8b1f-9d8d-4efa-8fc2-80be3f4d156a" />
